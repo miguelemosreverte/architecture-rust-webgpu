@@ -1,0 +1,90 @@
+{
+  "name": "Two Connected Rooms",
+  "camera": {
+    "position": [10.0, 7.0, 10.0],
+    "target": [2.5, 0.0, 0.0],
+    "fov": 50.0
+  },
+  "elements": [
+    {
+      "type": "room",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": {
+        "width": 4.0,
+        "height": 3.0,
+        "depth": 4.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": []
+        },
+        {
+          "side": "south",
+          "features": [
+            {
+              "type": "door",
+              "position": [0.0, 0.0],
+              "size": [0.9, 2.1],
+              "door_type": "single"
+            }
+          ]
+        },
+        {
+          "side": "east",
+          "features": [
+            {
+              "type": "door",
+              "position": [0.0, 0.0],
+              "size": [0.9, 2.1],
+              "door_type": "single"
+            }
+          ]
+        },
+        {
+          "side": "west",
+          "features": [
+            {
+              "type": "window",
+              "position": [0.0, 1.5],
+              "size": [1.5, 1.0]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "room",
+      "position": [5.0, 0.0, 0.0],
+      "dimensions": {
+        "width": 4.0,
+        "height": 3.0,
+        "depth": 6.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": [
+            {
+              "type": "window",
+              "position": [0.0, 1.5],
+              "size": [2.0, 1.2]
+            }
+          ]
+        },
+        {
+          "side": "south",
+          "features": []
+        },
+        {
+          "side": "east",
+          "features": []
+        },
+        {
+          "side": "west",
+          "features": []
+        }
+      ]
+    }
+  ]
+}

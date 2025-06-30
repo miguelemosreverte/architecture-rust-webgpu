@@ -1,0 +1,97 @@
+{
+  "name": "Building with Columns",
+  "camera": {
+    "position": [12.0, 8.0, 12.0],
+    "target": [0.0, 2.0, 0.0],
+    "fov": 50.0
+  },
+  "elements": [
+    {
+      "type": "floor",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": [12.0, 10.0],
+      "material": "marble"
+    },
+    {
+      "type": "column",
+      "position": [-4.0, 0.0, -3.0],
+      "radius": 0.3,
+      "height": 4.0,
+      "shape": "round"
+    },
+    {
+      "type": "column",
+      "position": [4.0, 0.0, -3.0],
+      "radius": 0.3,
+      "height": 4.0,
+      "shape": "round"
+    },
+    {
+      "type": "column",
+      "position": [-4.0, 0.0, 3.0],
+      "radius": 0.3,
+      "height": 4.0,
+      "shape": "round"
+    },
+    {
+      "type": "column",
+      "position": [4.0, 0.0, 3.0],
+      "radius": 0.3,
+      "height": 4.0,
+      "shape": "round"
+    },
+    {
+      "type": "ceiling",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": [12.0, 10.0],
+      "height": 4.0,
+      "material": "concrete"
+    },
+    {
+      "type": "room",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": {
+        "width": 8.0,
+        "height": 4.0,
+        "depth": 6.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": [
+            {
+              "type": "door",
+              "position": [-2.0, 0.0],
+              "size": [1.2, 2.4],
+              "door_type": "revolving"
+            },
+            {
+              "type": "door",
+              "position": [2.0, 0.0],
+              "size": [1.2, 2.4],
+              "door_type": "revolving"
+            }
+          ]
+        },
+        {
+          "side": "south",
+          "features": [
+            {
+              "type": "window",
+              "position": [0.0, 2.0],
+              "size": [6.0, 1.5]
+            }
+          ]
+        },
+        {
+          "side": "east",
+          "features": []
+        },
+        {
+          "side": "west",
+          "features": []
+        }
+      ]
+    }
+  ]
+}

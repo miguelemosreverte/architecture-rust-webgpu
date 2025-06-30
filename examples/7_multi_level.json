@@ -1,0 +1,116 @@
+{
+  "name": "Two-Story Building",
+  "camera": {
+    "position": [10.0, 8.0, 10.0],
+    "target": [0.0, 3.0, 0.0],
+    "fov": 50.0
+  },
+  "elements": [
+    {
+      "type": "floor",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": [8.0, 8.0],
+      "material": "concrete"
+    },
+    {
+      "type": "room",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": {
+        "width": 8.0,
+        "height": 3.0,
+        "depth": 8.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": [
+            {
+              "type": "window",
+              "position": [0.0, 1.5],
+              "size": [2.0, 1.2]
+            }
+          ]
+        },
+        {
+          "side": "south",
+          "features": [
+            {
+              "type": "door",
+              "position": [0.0, 0.0],
+              "size": [1.0, 2.1],
+              "door_type": "double"
+            }
+          ]
+        },
+        {
+          "side": "east",
+          "features": []
+        },
+        {
+          "side": "west",
+          "features": []
+        }
+      ]
+    },
+    {
+      "type": "ceiling",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": [8.0, 8.0],
+      "height": 3.0,
+      "material": "plaster"
+    },
+    {
+      "type": "floor",
+      "position": [0.0, 3.0, 0.0],
+      "dimensions": [8.0, 8.0],
+      "material": "wood"
+    },
+    {
+      "type": "room",
+      "position": [0.0, 3.0, 0.0],
+      "dimensions": {
+        "width": 8.0,
+        "height": 3.0,
+        "depth": 8.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": [
+            {
+              "type": "window",
+              "position": [-2.0, 1.5],
+              "size": [1.5, 1.0]
+            },
+            {
+              "type": "window",
+              "position": [2.0, 1.5],
+              "size": [1.5, 1.0]
+            }
+          ]
+        },
+        {
+          "side": "south",
+          "features": []
+        },
+        {
+          "side": "east",
+          "features": []
+        },
+        {
+          "side": "west",
+          "features": []
+        }
+      ]
+    },
+    {
+      "type": "stairs",
+      "position": [-3.0, 0.0, 0.0],
+      "width": 1.0,
+      "steps": 15,
+      "step_height": 0.2,
+      "step_depth": 0.3,
+      "has_railing": true
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Wall with Window",
+  "camera": {
+    "position": [5.0, 3.0, 5.0],
+    "target": [0.0, 1.5, 0.0],
+    "fov": 45.0
+  },
+  "elements": [
+    {
+      "type": "wall",
+      "start": [-3.0, 0.0, 0.0],
+      "end": [3.0, 0.0, 0.0],
+      "height": 3.0,
+      "thickness": 0.2,
+      "features": [
+        {
+          "type": "window",
+          "position": [0.0, 1.5],
+          "size": [1.5, 1.0],
+          "sill_height": 1.0
+        }
+      ]
+    }
+  ]
+}
