@@ -731,7 +731,7 @@ impl State {
                 }
                 
                 if let Some(img) = image::RgbaImage::from_raw(self.config.width, self.config.height, rgba_data) {
-                    let img = image::imageops::flip_vertical(&img);
+                    // Note: Removed flip_vertical as it was inverting the image
                     img.save(&filename).unwrap();
                     println!("Screenshot saved to: {}", filename);
                 } else {
