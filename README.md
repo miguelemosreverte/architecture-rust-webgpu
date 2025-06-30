@@ -69,17 +69,17 @@ The renderer includes 10 example scenes demonstrating various architectural elem
 <table>
 <tr>
 <td align="center">
-<img src="screenshots/example_01_single_wall.png" width="250"><br>
+<img src="screenshots/example_01_single_wall_v2.png" width="250"><br>
 <b>01: Single Wall</b><br>
 Basic wall primitive
 </td>
 <td align="center">
-<img src="screenshots/example_02_wall_with_window.png" width="250"><br>
+<img src="screenshots/example_02_wall_with_window_v2.png" width="250"><br>
 <b>02: Wall with Window</b><br>
 Wall with window cutout
 </td>
 <td align="center">
-<img src="screenshots/example_03_simple_room.png" width="250"><br>
+<img src="screenshots/example_03_simple_room_v2.png" width="250"><br>
 <b>03: Simple Room</b><br>
 Four walls forming a room
 </td>
@@ -90,17 +90,17 @@ Four walls forming a room
 <table>
 <tr>
 <td align="center">
-<img src="screenshots/example_04_room_with_door_window.png" width="250"><br>
+<img src="screenshots/example_04_room_with_door_window_v2.png" width="250"><br>
 <b>04: Room with Door & Window</b><br>
 Room with openings
 </td>
 <td align="center">
-<img src="screenshots/example_05_two_rooms.png" width="250"><br>
+<img src="screenshots/example_05_two_rooms_v2.png" width="250"><br>
 <b>05: Two Rooms</b><br>
 Connected room layout
 </td>
 <td align="center">
-<img src="screenshots/example_06_room_with_furniture.png" width="250"><br>
+<img src="screenshots/example_06_room_with_furniture_v2.png" width="250"><br>
 <b>06: Furnished Room</b><br>
 Room with furniture
 </td>
@@ -111,24 +111,24 @@ Room with furniture
 <table>
 <tr>
 <td align="center">
-<img src="screenshots/example_07_multi_level.png" width="250"><br>
+<img src="screenshots/example_07_multi_level_v2.png" width="250"><br>
 <b>07: Multi-Level</b><br>
 Two-story with stairs
 </td>
 <td align="center">
-<img src="screenshots/example_08_building_with_columns.png" width="250"><br>
+<img src="screenshots/example_08_building_with_columns_v2.png" width="250"><br>
 <b>08: Building with Columns</b><br>
 Architectural columns
 </td>
 </tr>
 <tr>
 <td align="center">
-<img src="screenshots/example_09_complex_floor_plan.png" width="250"><br>
+<img src="screenshots/example_09_complex_floor_plan_v2.png" width="250"><br>
 <b>09: Complex Floor Plan</b><br>
 Multiple connected rooms
 </td>
 <td align="center">
-<img src="screenshots/example_10_full_house.png" width="250"><br>
+<img src="screenshots/example_10_full_house_v2.png" width="250"><br>
 <b>10: Full House</b><br>
 Complete house layout
 </td>
@@ -139,7 +139,7 @@ Complete house layout
 <table>
 <tr>
 <td align="center">
-<img src="screenshots/example_00_test_room.png" width="400"><br>
+<img src="screenshots/example_00_test_room_v2.png" width="400"><br>
 <b>Test Room with Table</b><br>
 Simple room with a table in the center, showing furniture rendering
 </td>
