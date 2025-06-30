@@ -20,8 +20,38 @@ cd architecture-rust-webgpu
 
 # Build and run
 cargo build --release
+
+# Run with default scene (simple room)
 cargo run
+
+# Run with specific example by number
+cargo run -- 7              # Loads example 7 (multi-level building)
+cargo run -- 10             # Loads example 10 (full house)
+
+# Run with specific JSON file
+cargo run -- examples/5_two_rooms.json
+cargo run -- my_custom_scene.json
+
+# Run with example name (without number prefix)
+cargo run -- room_with_furniture
 ```
+
+### Interactive Controls
+
+While the application is running:
+
+**Camera Movement:**
+- `W` - Move forward
+- `S` - Move backward
+- `A` - Move left
+- `D` - Move right
+- `Space` - Move up
+- `Shift` - Move down
+- `Left Mouse + Drag` - Look around
+
+**Scene Selection:**
+- Press `1` through `9` for examples 1-9
+- Press `0` for example 10
 
 ### Examples
 

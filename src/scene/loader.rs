@@ -1,5 +1,5 @@
 use super::{Scene, Element, Room, WallSide, WallFeature};
-use super::primitives::{Mesh, Vertex, create_box, create_plane};
+use super::primitives::{Mesh, create_box, create_plane};
 use glam::Vec3;
 use std::fs;
 use std::path::Path;
@@ -169,7 +169,7 @@ fn room_to_mesh(room: &Room) -> Mesh {
     mesh
 }
 
-fn create_room_wall(room: &Room, side: &WallSide, features: &[WallFeature]) -> Mesh {
+fn create_room_wall(room: &Room, side: &WallSide, _features: &[WallFeature]) -> Mesh {
     let wall_thickness = 0.2;
     let (start, end) = match side {
         WallSide::North => (

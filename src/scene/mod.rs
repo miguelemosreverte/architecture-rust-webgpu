@@ -147,7 +147,7 @@ pub struct Furniture {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum FurnitureType {
     Table { width: f32, depth: f32, height: f32 },
     Chair { seat_height: f32 },
