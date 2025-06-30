@@ -37,8 +37,8 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let diffuse = max(dot(normalize(in.world_normal), light_dir), 0.0) * 0.7;
     let light = ambient + diffuse;
     
-    // Check if this is a floor (normal pointing up)
-    let is_floor = in.world_normal.y > 0.9;
+    // Check if this is a floor (normal pointing up AND at ground level)
+    let is_floor = in.world_normal.y > 0.9 && abs(in.world_position.y) < 0.1;
     
     var base_color = vec3<f32>(0.9, 0.9, 0.9);  // Default wall color
     

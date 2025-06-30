@@ -14,6 +14,24 @@ pub fn scene_to_mesh(scene: &Scene) -> Mesh {
     let mut combined_mesh = Mesh::new();
     let mut vertex_offset = 0u16;
 
+    // First, add a large base floor plane
+    let base_floor_size = 50.0; // 50x50 meter floor
+    let base_floor = create_plane(
+        Vec3::new(0.0, -0.01, 0.0), // Slightly below ground level to avoid z-fighting
+        glam::Vec2::new(base_floor_size, base_floor_size),
+        Vec3::Y,
+    );
+    
+    // Add base floor vertices
+    for vertex in &base_floor.vertices {
+        combined_mesh.vertices.push(*vertex);
+    }
+    for &index in &base_floor.indices {
+        combined_mesh.indices.push(index);
+    }
+    vertex_offset += base_floor.vertices.len() as u16;
+
+    // Then add all scene elements
     for element in &scene.elements {
         let element_mesh = element_to_mesh(element);
         
@@ -147,14 +165,7 @@ fn element_to_mesh(element: &Element) -> Mesh {
 fn room_to_mesh(room: &Room) -> Mesh {
     let mut mesh = Mesh::new();
     
-    // Create floor
-    let floor_mesh = create_plane(
-        room.position,
-        glam::Vec2::new(room.dimensions.width, room.dimensions.depth),
-        Vec3::Y,
-    );
-    mesh.vertices.extend_from_slice(&floor_mesh.vertices);
-    mesh.indices.extend_from_slice(&floor_mesh.indices);
+    // Skip creating individual room floors - we have a base floor now
     
     // Create walls
     for wall_spec in &room.walls {

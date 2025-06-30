@@ -228,7 +228,12 @@ pub fn create_plane(center: Vec3, size: Vec2, normal: Vec3) -> Mesh {
         Vec2::new(0.0, 1.0),
     ));
 
-    mesh.add_quad(v0, v1, v2, v3);
+    // Reverse winding order for upward-facing planes so they're visible from above
+    if normal.y > 0.5 {
+        mesh.add_quad(v0, v3, v2, v1);
+    } else {
+        mesh.add_quad(v0, v1, v2, v3);
+    }
     mesh
 }
 

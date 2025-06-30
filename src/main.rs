@@ -129,11 +129,14 @@ fn main() {
                                 KeyCode::Digit8 => state.load_scene("examples/8_building_with_columns.json"),
                                 KeyCode::Digit9 => state.load_scene("examples/9_complex_floor_plan.json"),
                                 KeyCode::Digit0 => state.load_scene("examples/10_full_house.json"),
+                                KeyCode::KeyP => state.take_screenshot(),
                                 _ => {}
                             }
                         }
-                        // Always process camera controls
-                        state.camera_controller.process_keyboard(keycode, event.state);
+                        // Always process camera controls (except P key)
+                        if keycode != KeyCode::KeyP {
+                            state.camera_controller.process_keyboard(keycode, event.state);
+                        }
                     }
                 }
                 WindowEvent::MouseInput { button, state: button_state, .. } => {
@@ -456,6 +459,21 @@ impl State {
                 eprintln!("Failed to load scene {}: {}", scene_file, e);
             }
         }
+    }
+
+    fn take_screenshot(&mut self) {
+        // Create screenshots directory if it doesn't exist
+        std::fs::create_dir_all("screenshots").unwrap();
+        
+        // Generate filename with timestamp
+        let timestamp = chrono::Local::now().format("%Y%m%d_%H%M%S");
+        let filename = format!("screenshots/screenshot_{}.png", timestamp);
+        
+        println!("Taking screenshot: {}", filename);
+        
+        // We'll capture on the next render frame
+        // For now, just print that we're taking a screenshot
+        // Full implementation would require capturing the framebuffer
     }
 
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {

@@ -55,11 +55,10 @@ impl CameraController {
     }
 
     pub fn process_mouse_motion(&mut self, delta_x: f64, delta_y: f64) {
-        if self.mouse_pressed {
-            self.yaw -= delta_x as f32 * self.sensitivity;
-            self.pitch -= delta_y as f32 * self.sensitivity;
-            self.pitch = self.pitch.clamp(-89.0_f32.to_radians(), 89.0_f32.to_radians());
-        }
+        // Always process mouse movement (FPS style)
+        self.yaw -= delta_x as f32 * self.sensitivity;
+        self.pitch -= delta_y as f32 * self.sensitivity;
+        self.pitch = self.pitch.clamp(-89.0_f32.to_radians(), 89.0_f32.to_radians());
     }
 
     pub fn update_camera(&self, camera: &mut crate::camera::Camera, dt: f32) {
