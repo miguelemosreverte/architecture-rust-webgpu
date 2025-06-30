@@ -110,4 +110,17 @@ impl CameraController {
         self.yaw = dir.z.atan2(dir.x);
         self.pitch = dir.y.asin();
     }
+
+    pub fn get_yaw(&self) -> f32 {
+        self.yaw
+    }
+
+    pub fn get_pitch(&self) -> f32 {
+        self.pitch
+    }
+
+    pub fn set_yaw_pitch(&mut self, yaw: f32, pitch: f32) {
+        self.yaw = yaw;
+        self.pitch = pitch.clamp(-89.0_f32.to_radians(), 89.0_f32.to_radians());
+    }
 }

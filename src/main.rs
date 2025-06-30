@@ -4,9 +4,10 @@ use webgpu_rust_architecture::{
     scene::{loader::{load_scene_from_file, scene_to_mesh}, primitives::Vertex},
     shaders::SCENE_SHADER,
 };
+use glam::Vec3;
 use winit::{
     dpi::PhysicalSize,
-    event::{Event, WindowEvent, ElementState, MouseButton, DeviceEvent},
+    event::{Event, WindowEvent, ElementState, DeviceEvent},
     event_loop::EventLoop,
     keyboard::{PhysicalKey, KeyCode},
     window::Window,
@@ -34,59 +35,120 @@ fn create_depth_texture(device: &wgpu::Device, config: &wgpu::SurfaceConfigurati
     texture.create_view(&wgpu::TextureViewDescriptor::default())
 }
 
+fn parse_screenshot_filename(filename: &str) -> Option<(f32, f32, f32, f32, f32)> {
+    // Extract just the filename if it's a path
+    let filename = std::path::Path::new(filename)
+        .file_stem()?
+        .to_str()?;
+    
+    // Find pos and rot markers
+    let pos_start = filename.find("_pos_")?;
+    let rot_start = filename.find("_rot_")?;
+    
+    // Extract the position substring
+    let pos_str = &filename[pos_start + 5..rot_start];
+    let pos_parts: Vec<&str> = pos_str.split('_').collect();
+    if pos_parts.len() != 3 {
+        return None;
+    }
+    
+    // Extract the rotation substring
+    let rot_str = &filename[rot_start + 5..];
+    let rot_parts: Vec<&str> = rot_str.split('_').collect();
+    if rot_parts.len() < 2 {
+        return None;
+    }
+    
+    // Parse position values
+    let x = pos_parts[0].parse::<f32>().ok()?;
+    let y = pos_parts[1].parse::<f32>().ok()?;
+    let z = pos_parts[2].parse::<f32>().ok()?;
+    
+    // Parse rotation values (convert from degrees to radians)
+    let yaw_deg = rot_parts[0].parse::<f32>().ok()?;
+    let pitch_deg = rot_parts[1].parse::<f32>().ok()?;
+    
+    Some((x, y, z, yaw_deg.to_radians(), pitch_deg.to_radians()))
+}
+
 fn main() {
     env_logger::init();
     
     // Parse command line arguments
     let args: Vec<String> = std::env::args().collect();
-    let scene_file = if args.len() > 1 {
-        // Handle different argument formats
-        let arg = &args[1];
-        if arg.ends_with(".json") {
-            // Full path to JSON file
-            arg.clone()
-        } else if let Ok(num) = arg.parse::<u32>() {
-            // Just a number - use example file
-            if num == 0 {
-                "examples/10_full_house.json".to_string()
-            } else if num <= 10 {
-                format!("examples/{}_*.json", num)
-                    .replace("*", match num {
-                        1 => "single_wall",
-                        2 => "wall_with_window",
-                        3 => "simple_room",
-                        4 => "room_with_door_window",
-                        5 => "two_rooms",
-                        6 => "room_with_furniture",
-                        7 => "multi_level",
-                        8 => "building_with_columns",
-                        9 => "complex_floor_plan",
-                        10 => "full_house",
-                        _ => "simple_room",
-                    })
+    let mut scene_file = String::new();
+    let mut screenshot_info: Option<(f32, f32, f32, f32, f32)> = None;
+    
+    let mut i = 1;
+    while i < args.len() {
+        if args[i] == "--screenshot" && i + 1 < args.len() {
+            // Parse screenshot filename for camera info
+            let screenshot_arg = &args[i + 1];
+            if let Some(camera_info) = parse_screenshot_filename(screenshot_arg) {
+                screenshot_info = Some(camera_info);
+                println!("Reproducing camera from screenshot: {}", screenshot_arg);
             } else {
-                eprintln!("Example number must be between 1-10 (or 0 for example 10)");
+                eprintln!("Error: Invalid screenshot filename format");
+                eprintln!("Expected format: screenshot_TIMESTAMP_pos_X_Y_Z_rot_YAW_PITCH.png");
                 std::process::exit(1);
             }
+            i += 2;
+        } else if scene_file.is_empty() {
+            // Handle scene file argument
+            let arg = &args[i];
+            scene_file = if arg.ends_with(".json") {
+                // Full path to JSON file
+                arg.clone()
+            } else if let Ok(num) = arg.parse::<u32>() {
+                // Just a number - use example file
+                if num == 0 {
+                    "examples/10_full_house.json".to_string()
+                } else if num <= 10 {
+                    format!("examples/{}_*.json", num)
+                        .replace("*", match num {
+                            1 => "single_wall",
+                            2 => "wall_with_window",
+                            3 => "simple_room",
+                            4 => "room_with_door_window",
+                            5 => "two_rooms",
+                            6 => "room_with_furniture",
+                            7 => "multi_level",
+                            8 => "building_with_columns",
+                            9 => "complex_floor_plan",
+                            10 => "full_house",
+                            _ => "simple_room",
+                        })
+                } else {
+                    eprintln!("Example number must be between 1-10 (or 0 for example 10)");
+                    std::process::exit(1);
+                }
+            } else {
+                // Try to find the file in examples directory
+                format!("examples/{}.json", arg)
+            };
+            i += 1;
         } else {
-            // Try to find the file in examples directory
-            format!("examples/{}.json", arg)
+            eprintln!("Unknown argument: {}", args[i]);
+            i += 1;
         }
-    } else {
-        "examples/3_simple_room.json".to_string()
-    };
+    }
+    
+    if scene_file.is_empty() {
+        scene_file = "examples/3_simple_room.json".to_string();
+    }
     
     // Check if file exists
     if !std::path::Path::new(&scene_file).exists() {
         eprintln!("Error: Scene file '{}' not found!", scene_file);
         eprintln!("\nUsage:");
-        eprintln!("  {} [scene_file.json]     # Load specific JSON file", args[0]);
-        eprintln!("  {} [1-10]                # Load example by number", args[0]);
-        eprintln!("  {} 3_simple_room         # Load example by name", args[0]);
+        eprintln!("  {} [scene_file.json]                    # Load specific JSON file", args[0]);
+        eprintln!("  {} [1-10]                               # Load example by number", args[0]);
+        eprintln!("  {} 3_simple_room                        # Load example by name", args[0]);
+        eprintln!("  {} --screenshot <screenshot.png> [scene]  # Reproduce camera from screenshot", args[0]);
         eprintln!("\nExamples:");
         eprintln!("  {} examples/5_two_rooms.json", args[0]);
         eprintln!("  {} 7", args[0]);
-        eprintln!("  {} my_custom_scene.json", args[0]);
+        eprintln!("  {} --screenshot screenshot_20240701_120000_pos_1.00_2.00_3.00_rot_45.00_30.00.png", args[0]);
         std::process::exit(1);
     }
     
@@ -99,7 +161,7 @@ fn main() {
         .unwrap();
 
     let window = std::sync::Arc::new(window);
-    let mut state = pollster::block_on(State::new(window.clone(), &scene_file));
+    let mut state = pollster::block_on(State::new(window.clone(), &scene_file, screenshot_info));
 
     let _ = event_loop.run(move |event, target| {
         match event {
@@ -201,10 +263,12 @@ struct State {
     depth_texture: wgpu::TextureView,
     camera_controller: CameraController,
     last_update: std::time::Instant,
+    screenshot_requested: bool,
+    auto_screenshot_mode: bool,
 }
 
 impl State {
-    async fn new(window: std::sync::Arc<winit::window::Window>, scene_file: &str) -> Self {
+    async fn new(window: std::sync::Arc<winit::window::Window>, scene_file: &str, screenshot_info: Option<(f32, f32, f32, f32, f32)>) -> Self {
         let size = window.inner_size();
 
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
@@ -264,7 +328,7 @@ impl State {
         
         // Create camera
         let aspect = size.width as f32 / size.height as f32;
-        let camera = Camera::from_scene(&scene.camera, aspect);
+        let mut camera = Camera::from_scene(&scene.camera, aspect);
         let mut camera_uniform = CameraUniform::new();
         camera_uniform.update_view_proj(&camera);
 
@@ -400,8 +464,26 @@ impl State {
         // Create camera controller
         let mut camera_controller = CameraController::new(10.0, 0.003);
         camera_controller.set_initial_direction(&camera);
+        
+        // Apply screenshot camera info if provided
+        let auto_screenshot = if let Some((x, y, z, yaw, pitch)) = screenshot_info {
+            camera.position = Vec3::new(x, y, z);
+            camera_controller.set_yaw_pitch(yaw, pitch);
+            camera_controller.update_camera(&mut camera, 0.0);
+            camera_uniform.update_view_proj(&camera);
+            queue.write_buffer(
+                &camera_buffer,
+                0,
+                bytemuck::cast_slice(&[camera_uniform]),
+            );
+            println!("Camera positioned at ({:.2}, {:.2}, {:.2}) with rotation ({:.1}°, {:.1}°)", 
+                     x, y, z, yaw.to_degrees(), pitch.to_degrees());
+            true
+        } else {
+            false
+        };
 
-        Self {
+        let state = Self {
             surface,
             device,
             queue,
@@ -419,7 +501,16 @@ impl State {
             depth_texture,
             camera_controller,
             last_update: std::time::Instant::now(),
+            screenshot_requested: auto_screenshot,
+            auto_screenshot_mode: auto_screenshot,
+        };
+        
+        // If auto-screenshot is requested, render one frame immediately
+        if auto_screenshot {
+            println!("Taking screenshot with reproduced camera position...");
         }
+        
+        state
     }
 
     fn load_scene(&mut self, scene_file: &str) {
@@ -462,18 +553,8 @@ impl State {
     }
 
     fn take_screenshot(&mut self) {
-        // Create screenshots directory if it doesn't exist
-        std::fs::create_dir_all("screenshots").unwrap();
-        
-        // Generate filename with timestamp
-        let timestamp = chrono::Local::now().format("%Y%m%d_%H%M%S");
-        let filename = format!("screenshots/screenshot_{}.png", timestamp);
-        
-        println!("Taking screenshot: {}", filename);
-        
-        // We'll capture on the next render frame
-        // For now, just print that we're taking a screenshot
-        // Full implementation would require capturing the framebuffer
+        self.screenshot_requested = true;
+        println!("Screenshot requested - will capture next frame");
     }
 
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
@@ -503,16 +584,37 @@ impl State {
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
 
+        // Create screenshot texture if requested
+        let screenshot_texture = if self.screenshot_requested {
+            Some(self.device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("Screenshot Texture"),
+                size: wgpu::Extent3d {
+                    width: self.config.width,
+                    height: self.config.height,
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 1,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: self.config.format,
+                usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+                view_formats: &[],
+            }))
+        } else {
+            None
+        };
+
         let mut encoder = self.device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Render Encoder"),
             });
 
-        {
+        // Helper function to render the scene
+        let render_to_target = |encoder: &mut wgpu::CommandEncoder, target: &wgpu::TextureView, depth_texture: &wgpu::TextureView, pipeline: &wgpu::RenderPipeline, bind_group: &wgpu::BindGroup, vertex_buffer: &wgpu::Buffer, index_buffer: &wgpu::Buffer, num_indices: u32| {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
+                    view: target,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
@@ -525,7 +627,7 @@ impl State {
                     },
                 })],
                 depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.depth_texture,
+                    view: depth_texture,
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(1.0),
                         store: wgpu::StoreOp::Store,
@@ -536,14 +638,119 @@ impl State {
                 occlusion_query_set: None,
             });
 
-            render_pass.set_pipeline(&self.render_pipeline);
-            render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
-            render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
-            render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-            render_pass.draw_indexed(0..self.num_indices, 0, 0..1);
-        }
+            render_pass.set_pipeline(pipeline);
+            render_pass.set_bind_group(0, bind_group, &[]);
+            render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
+            render_pass.set_index_buffer(index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+            render_pass.draw_indexed(0..num_indices, 0, 0..1);
+        };
 
-        self.queue.submit(std::iter::once(encoder.finish()));
+        // Always render to the main view
+        render_to_target(&mut encoder, &view, &self.depth_texture, &self.render_pipeline, &self.camera_bind_group, &self.vertex_buffer, &self.index_buffer, self.num_indices);
+
+        // Handle screenshot if requested
+        if self.screenshot_requested && screenshot_texture.is_some() {
+            let texture = screenshot_texture.unwrap();
+            let screenshot_view = texture.create_view(&wgpu::TextureViewDescriptor::default());
+            
+            // Also render to screenshot texture
+            render_to_target(&mut encoder, &screenshot_view, &self.depth_texture, &self.render_pipeline, &self.camera_bind_group, &self.vertex_buffer, &self.index_buffer, self.num_indices);
+            
+            // Create buffer for reading texture data
+            let u32_size = std::mem::size_of::<u32>() as u32;
+            let output_buffer_size = (u32_size * self.config.width * self.config.height) as wgpu::BufferAddress;
+            let output_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+                size: output_buffer_size,
+                usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
+                label: Some("Screenshot Buffer"),
+                mapped_at_creation: false,
+            });
+            
+            encoder.copy_texture_to_buffer(
+                wgpu::ImageCopyTexture {
+                    texture: &texture,
+                    mip_level: 0,
+                    origin: wgpu::Origin3d::ZERO,
+                    aspect: wgpu::TextureAspect::All,
+                },
+                wgpu::ImageCopyBuffer {
+                    buffer: &output_buffer,
+                    layout: wgpu::ImageDataLayout {
+                        offset: 0,
+                        bytes_per_row: Some(u32_size * self.config.width),
+                        rows_per_image: Some(self.config.height),
+                    },
+                },
+                wgpu::Extent3d {
+                    width: self.config.width,
+                    height: self.config.height,
+                    depth_or_array_layers: 1,
+                },
+            );
+            
+            let submission_index = self.queue.submit(std::iter::once(encoder.finish()));
+            
+            // Create screenshot directory
+            std::fs::create_dir_all("screenshots").unwrap();
+            let timestamp = chrono::Local::now().format("%Y%m%d_%H%M%S");
+            
+            // Format camera position and rotation for filename
+            let pos = self.camera.position;
+            let yaw = self.camera_controller.get_yaw();
+            let pitch = self.camera_controller.get_pitch();
+            
+            // Create filename with camera info (rounded to 2 decimal places)
+            let filename = format!(
+                "screenshots/screenshot_{}_pos_{:.2}_{:.2}_{:.2}_rot_{:.2}_{:.2}.png",
+                timestamp,
+                pos.x, pos.y, pos.z,
+                yaw.to_degrees(), pitch.to_degrees()
+            );
+            
+            // Map buffer and save image
+            let buffer_slice = output_buffer.slice(..);
+            let (sender, receiver) = std::sync::mpsc::channel();
+            buffer_slice.map_async(wgpu::MapMode::Read, move |result| {
+                sender.send(result).unwrap();
+            });
+            
+            self.device.poll(wgpu::Maintain::WaitForSubmissionIndex(submission_index));
+            receiver.recv().unwrap().unwrap();
+            
+            {
+                let data = buffer_slice.get_mapped_range();
+                let buffer: Vec<u8> = data.to_vec();
+                
+                // Convert BGRA to RGBA
+                let mut rgba_data = vec![0u8; buffer.len()];
+                for i in (0..buffer.len()).step_by(4) {
+                    rgba_data[i] = buffer[i + 2];     // R
+                    rgba_data[i + 1] = buffer[i + 1]; // G
+                    rgba_data[i + 2] = buffer[i];     // B
+                    rgba_data[i + 3] = buffer[i + 3]; // A
+                }
+                
+                if let Some(img) = image::RgbaImage::from_raw(self.config.width, self.config.height, rgba_data) {
+                    let img = image::imageops::flip_vertical(&img);
+                    img.save(&filename).unwrap();
+                    println!("Screenshot saved to: {}", filename);
+                } else {
+                    eprintln!("Failed to create image from raw data");
+                }
+            }
+            
+            output_buffer.unmap();
+            self.screenshot_requested = false;
+            
+            // Exit if in auto-screenshot mode
+            if self.auto_screenshot_mode {
+                println!("Auto-screenshot complete. Exiting...");
+                std::process::exit(0);
+            }
+        } else {
+            self.queue.submit(std::iter::once(encoder.finish()));
+        }
+        
         output.present();
 
         Ok(())
