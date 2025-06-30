@@ -1,0 +1,48 @@
+{
+  "name": "Test Room with Table",
+  "camera": {
+    "position": [6.0, 4.0, 6.0],
+    "target": [0.0, 1.0, 0.0],
+    "fov": 45.0
+  },
+  "elements": [
+    {
+      "type": "room",
+      "position": [0.0, 0.0, 0.0],
+      "dimensions": {
+        "width": 6.0,
+        "height": 3.0,
+        "depth": 6.0
+      },
+      "walls": [
+        {
+          "side": "north",
+          "features": []
+        },
+        {
+          "side": "south",
+          "features": []
+        },
+        {
+          "side": "east",
+          "features": []
+        },
+        {
+          "side": "west",
+          "features": []
+        }
+      ]
+    },
+    {
+      "type": "furniture",
+      "position": [0.0, 0.0, 0.0],
+      "rotation": 0.0,
+      "furniture_type": {
+        "type": "table",
+        "width": 2.0,
+        "depth": 1.0,
+        "height": 0.8
+      }
+    }
+  ]
+}

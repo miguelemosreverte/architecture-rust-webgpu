@@ -270,11 +270,12 @@ pub fn create_cylinder(center: Vec3, radius: f32, height: f32, segments: u32) ->
         let bottom_next = next * 2;
         let top_next = bottom_next + 1;
 
+        // Reverse winding order for outward-facing surfaces
         mesh.add_quad(
             bottom_current as u16,
-            bottom_next as u16,
-            top_next as u16,
             top_current as u16,
+            top_next as u16,
+            bottom_next as u16,
         );
     }
 
@@ -298,18 +299,18 @@ pub fn create_cylinder(center: Vec3, radius: f32, height: f32, segments: u32) ->
         let bottom_next = next * 2;
         let top_next = bottom_next + 1;
 
-        // Bottom cap
+        // Bottom cap (viewed from below, so reversed)
         mesh.add_triangle(
             bottom_center,
-            bottom_next as u16,
             bottom_current as u16,
+            bottom_next as u16,
         );
 
-        // Top cap
+        // Top cap (viewed from above)
         mesh.add_triangle(
             top_center,
-            top_current as u16,
             top_next as u16,
+            top_current as u16,
         );
     }
 

@@ -48,7 +48,7 @@ While the application is running:
 - `Space` - Move up
 - `Shift` - Move down
 - Mouse movement - Look around (FPS style)
-- `P` - Take screenshot (saved to screenshots/)
+- `P` - Take screenshot (creates screenshots/ folder, full capture coming soon)
 
 **Scene Selection:**
 - Press `1` through `9` for examples 1-9

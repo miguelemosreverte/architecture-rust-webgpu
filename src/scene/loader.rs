@@ -201,14 +201,25 @@ fn create_room_wall(room: &Room, side: &WallSide, _features: &[WallFeature]) -> 
         ),
     };
     
-    // For now, create a simple wall without cutouts for features
-    // TODO: Implement proper wall cutouts for windows and doors
-    create_box(
-        (start + end) * 0.5 + Vec3::new(0.0, room.dimensions.height * 0.5, 0.0),
-        Vec3::new(
-            (end - start).length(),
-            room.dimensions.height,
-            wall_thickness,
-        ),
-    )
+    // Calculate wall center and dimensions
+    let wall_center = (start + end) * 0.5 + Vec3::new(0.0, room.dimensions.height * 0.5, 0.0);
+    let wall_length = (end - start).length();
+    
+    // Create wall with proper orientation
+    match side {
+        WallSide::North | WallSide::South => {
+            // Walls running east-west
+            create_box(
+                wall_center,
+                Vec3::new(wall_length, room.dimensions.height, wall_thickness),
+            )
+        }
+        WallSide::East | WallSide::West => {
+            // Walls running north-south (need different orientation)
+            create_box(
+                wall_center,
+                Vec3::new(wall_thickness, room.dimensions.height, wall_length),
+            )
+        }
+    }
 }

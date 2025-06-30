@@ -65,7 +65,7 @@ impl CameraController {
         // Calculate forward and right vectors based on yaw
         let (sin_yaw, cos_yaw) = self.yaw.sin_cos();
         let forward = Vec3::new(sin_yaw, 0.0, cos_yaw).normalize();
-        let right = Vec3::new(cos_yaw, 0.0, -sin_yaw).normalize();
+        let right = Vec3::new(-cos_yaw, 0.0, sin_yaw).normalize();
 
         let mut velocity = Vec3::ZERO;
 
