@@ -129,12 +129,24 @@ cargo clippy
 
 - [x] Basic WebGPU setup with winit
 - [x] Triangle rendering with vertex colors
-- [ ] 3D primitive geometry generation
-- [ ] JSON scene parser
-- [ ] Camera system with controls
+- [x] 3D primitive geometry generation
+- [x] JSON scene parser
+- [x] Camera system with controls (WASD + mouse)
+- [x] Depth buffer for proper 3D rendering
+- [x] Grid floor with measurement lines
 - [ ] WASM build configuration
 - [ ] Web demo page
-- [ ] Example scenes (1.json through 10.json)
+- [x] Example scenes (1.json through 10.json)
+
+## Features
+
+### Grid Floor System
+The renderer includes a sophisticated grid floor system that helps visualize scale and dimensions:
+- **1-meter grid lines** in light grey
+- **5-meter major grid lines** in darker grey
+- **Axis indicators**: X-axis (red) and Z-axis (blue)
+- **Subtle checkerboard pattern** for better depth perception
+- Grid only renders on horizontal floor surfaces
 
 ## Dependencies
 
