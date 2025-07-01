@@ -54,6 +54,7 @@ While the application is running:
 - `Shift` - Move down
 - Mouse movement - Look around (FPS style)
 - `P` - Take screenshot (saves to screenshots/ folder with timestamp)
+- `Escape` - Exit application
 
 **Scene Selection:**
 - Press `1` through `9` for examples 1-9

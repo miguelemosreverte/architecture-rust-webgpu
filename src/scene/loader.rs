@@ -167,6 +167,15 @@ fn room_to_mesh(room: &Room) -> Mesh {
     
     // Skip creating individual room floors - we have a base floor now
     
+    // Create ceiling
+    let ceiling = create_plane(
+        room.position + Vec3::new(0.0, room.dimensions.height, 0.0),
+        glam::Vec2::new(room.dimensions.width, room.dimensions.depth),
+        -Vec3::Y, // Normal pointing down
+    );
+    mesh.vertices.extend_from_slice(&ceiling.vertices);
+    mesh.indices.extend_from_slice(&ceiling.indices);
+    
     // Create walls
     for wall_spec in &room.walls {
         let wall_mesh = create_room_wall(room, &wall_spec.side, &wall_spec.features);

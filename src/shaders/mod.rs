@@ -1,6 +1,7 @@
 pub const SCENE_SHADER: &str = r#"
 struct CameraUniform {
     view_proj: mat4x4<f32>,
+    camera_pos: vec4<f32>,
 }
 
 @group(0) @binding(0)
@@ -31,14 +32,30 @@ fn vs_main(in: VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    // Simple lighting
-    let light_dir = normalize(vec3<f32>(1.0, 1.0, 1.0));
+    // Simple lighting - light coming from opposite side of typical camera position
+    // This creates shadows that help understand geometry
+    let light_dir = normalize(vec3<f32>(-0.5, -1.0, 0.5));
     let ambient = 0.3;
     let diffuse = max(dot(normalize(in.world_normal), light_dir), 0.0) * 0.7;
     let light = ambient + diffuse;
     
     // Check if this is a floor (normal pointing up AND at ground level)
     let is_floor = in.world_normal.y > 0.9 && abs(in.world_position.y) < 0.1;
+    
+    // Check if this is a ceiling/roof (normal pointing down AND above 2m)
+    let is_ceiling = in.world_normal.y < -0.9 && in.world_position.y > 2.0;
+    
+    // Calculate distance from camera to fragment
+    let camera_distance = length(camera.camera_pos.xyz - in.world_position);
+    
+    // Calculate transparency based on distance and type
+    var alpha = 1.0;
+    if (is_ceiling) {
+        // Fade ceiling when camera is close (within 15 meters)
+        if (camera_distance < 15.0) {
+            alpha = smoothstep(5.0, 15.0, camera_distance);
+        }
+    }
     
     var base_color = vec3<f32>(0.9, 0.9, 0.9);  // Default wall color
     
@@ -90,6 +107,6 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         }
     }
     
-    return vec4<f32>(base_color * light, 1.0);
+    return vec4<f32>(base_color * light, alpha);
 }
 "#;

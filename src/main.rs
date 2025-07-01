@@ -181,6 +181,7 @@ fn main() {
                         // Handle scene switching only on press
                         if event.state == ElementState::Pressed {
                             match keycode {
+                                KeyCode::Escape => target.exit(),
                                 KeyCode::Digit1 => state.load_scene("examples/1_single_wall.json"),
                                 KeyCode::Digit2 => state.load_scene("examples/2_wall_with_window.json"),
                                 KeyCode::Digit3 => state.load_scene("examples/3_simple_room.json"),
@@ -342,7 +343,7 @@ impl State {
         let camera_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[wgpu::BindGroupLayoutEntry {
                 binding: 0,
-                visibility: wgpu::ShaderStages::VERTEX,
+                visibility: wgpu::ShaderStages::VERTEX | wgpu::ShaderStages::FRAGMENT,
                 ty: wgpu::BindingType::Buffer {
                     ty: wgpu::BufferBindingType::Uniform,
                     has_dynamic_offset: false,
@@ -428,7 +429,7 @@ impl State {
                 entry_point: Some("fs_main"),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: config.format,
-                    blend: Some(wgpu::BlendState::REPLACE),
+                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: Default::default(),

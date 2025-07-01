@@ -5,12 +5,14 @@ use bytemuck::{Pod, Zeroable};
 #[derive(Debug, Copy, Clone, Pod, Zeroable)]
 pub struct CameraUniform {
     view_proj: [[f32; 4]; 4],
+    camera_pos: [f32; 4], // vec3 position + padding for alignment
 }
 
 impl CameraUniform {
     pub fn new() -> Self {
         Self {
             view_proj: Mat4::IDENTITY.to_cols_array_2d(),
+            camera_pos: [0.0, 0.0, 0.0, 0.0],
         }
     }
 
@@ -23,6 +25,7 @@ impl CameraUniform {
             1000.0,
         );
         self.view_proj = (proj * view).to_cols_array_2d();
+        self.camera_pos = [camera.position.x, camera.position.y, camera.position.z, 0.0];
     }
 }
 
